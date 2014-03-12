@@ -6,19 +6,27 @@ class nfs::params (
   $nfs_v4_idmap_domain = $::domain
 ) {
 
-  # Somehow the ::osfamliy fact doesnt exist on some oled systems
-
-  case $::operatingsystem {
-    'centos', 'redhat', 'scientific', 'fedora': {
-      $osfamily = 'redhat'
-    } 'debian', 'Ubuntu': {
-      $osfamily = 'debian'
-    } 'windows': {
-      fail('fail!11')
-    } 'darwin':{
-      $osfamily = 'darwin'
-    } default: {
-      fail("OS: ${::operatingsystem} not supported")
+  case $::osfamily {
+    'Debian': {
+      case $::operatingsystem {
+        'Ubuntu': {
+          $portmap_service = 'portmap'
+          $portmap_package = 'portmap'
+          $idmap_service   = 'nfs-common'
+          $idmap_package   = 'idmapd'
+          $extra_packages  = ['nfs4-acl-tools']
+        }
+        'Debian': {
+          $portmap_service = 'rpcbind'
+          $portmap_package = 'rpcbind'
+          $idmap_service   = 'nfs-common'
+          $idmap_package   = 'nfs-common'
+          $extra_packages  = ['nfs4-acl-tools']
+        }
+      }
+    }
+    default: {
+      fail("Unsupported OS")
     }
   }
 }

@@ -1,18 +1,14 @@
 class nfs::client::debian::install {
-
-  case $::lsbdistcodename {
-    'lucid': {
-      package { 'portmap':
-        ensure => installed,
-      }
-    } default: {
-      package { 'rpcbind':
-        ensure => installed,
-      }
-    }
+  
+  package {$nfs::params::portmap_package:
+    ensure => installed,
   }
 
-  package { ['nfs-common', 'nfs4-acl-tools']:
+  package {$nfs::params::idmap_package:
+    ensure => installed,
+  }
+
+  package {$nfs::params::extra_packages:
     ensure => installed,
   }
 

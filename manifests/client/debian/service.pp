@@ -4,22 +4,21 @@ class nfs::client::debian::service {
     require => Class['nfs::client::debian::configure']
   }
 
-    service { "portmap":
-      ensure    => running,
-      enable    => true,
-      hasstatus => false,
-    } 
+  service { $nfs::params::portmap_service:
+    ensure    => running,
+    enable    => true,
+    hasstatus => false,
+  }
 
   if $nfs::client::debian::nfs_v4 {
-    service {
-      'idmapd':
-        ensure => running,
-        subscribe => Augeas['/etc/idmapd.conf', '/etc/default/nfs-common'],
-    }
+    $ensure_idmapd = 'running'
+    $subscribe = Augeas[ '/etc/idmapd.conf', '/etc/default/nfs-common' ]
   } else {
-      service {
-        'idmapd':
-          ensure => stopped,
-      }
+    $ensure_idmapd = 'stopped'
+  }
+
+  service { $nfs::params::idmap_service:
+      ensure    => $ensure_idmapd,
+      subscribe => $subscribe,
   }
 }
